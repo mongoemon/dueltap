@@ -1,0 +1,7 @@
+name,auto_attack,tap_attack,defense,speed,stamina,strength,hp
+Warrior,11,6,12,3,5,15,100
+Mage,12,7,7,5,4,10,80
+Ninja,7,5,10,6,6,12,90
+Knight,10,5,15,4,3,18,110
+Priest,8,4,10,4,7,8,95
+Dummy,10,3,8,6,8,5,100

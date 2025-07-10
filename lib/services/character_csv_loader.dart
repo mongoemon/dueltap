@@ -1,0 +1,37 @@
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
+import '../models/character.dart';
+
+Future<List<Character>> loadCharactersFromCsv(String assetPath) async {
+  final csvString = await rootBundle.loadString(assetPath);
+  final lines = LineSplitter.split(csvString).toList();
+  final header = lines.first.split(',');
+  final nameIdx = header.indexOf('name');
+  final autoAtkIdx = header.indexOf('auto_attack');
+  final tapAtkIdx = header.indexOf('tap_attack');
+  final defIdx = header.indexOf('defense');
+  final spdIdx = header.indexOf('speed');
+  final staIdx = header.indexOf('stamina');
+  final strIdx = header.indexOf('strength');
+  final hpIdx = header.indexOf('hp');
+
+  return lines.skip(1).map((line) {
+    final fields = line.split(',');
+    final name = fields[nameIdx];
+    final charClass = CharacterClass.values.firstWhere(
+      (e) => e.name.toLowerCase() == name.toLowerCase(),
+      orElse: () => CharacterClass.knight,
+    );
+    return Character(
+      name: name,
+      charClass: charClass,
+      autoAttack: int.parse(fields[autoAtkIdx]),
+      tapAttack: int.parse(fields[tapAtkIdx]),
+      defense: int.parse(fields[defIdx]),
+      speed: int.parse(fields[spdIdx]),
+      stamina: int.parse(fields[staIdx]),
+      strength: int.parse(fields[strIdx]),
+      hp: int.parse(fields[hpIdx]),
+    );
+  }).toList();
+}
