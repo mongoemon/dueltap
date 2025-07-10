@@ -12,6 +12,6 @@ final magePrototype = Character(
   stamina: 10,
   exhaust: 100,
   exhaustRecovery: 20,
-  skills: [Skill('Arcane Burst', 'Area-effect skill, high mana cost', 10)],
+  skills: [], // TODO: Load skills from SkillConfig (CSV) at runtime
   equipment: [],
 );

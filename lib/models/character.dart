@@ -1,3 +1,5 @@
+import '../services/skills_csv_loader.dart';
+
 // Character model: stats, class, skills, equipment
 class Character {
   String name;
@@ -51,7 +53,29 @@ class Skill {
   final String name;
   final String description;
   final int cooldown;
-  Skill(this.name, this.description, this.cooldown);
+  final double multiplier;
+  final String effectType;
+  final double effectValue;
+
+  Skill({
+    required this.name,
+    required this.description,
+    required this.cooldown,
+    required this.multiplier,
+    required this.effectType,
+    required this.effectValue,
+  });
+
+  factory Skill.fromConfig(SkillConfig config) {
+    return Skill(
+      name: config.skillName,
+      description: config.description,
+      cooldown: config.cooldown,
+      multiplier: config.multiplier,
+      effectType: config.effectType,
+      effectValue: config.effectValue,
+    );
+  }
 }
 
 class Equipment {

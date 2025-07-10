@@ -12,6 +12,6 @@ final warriorPrototype = Character(
   stamina: 12,
   exhaust: 100,
   exhaustRecovery: 20,
-  skills: [Skill('Iron Smash', 'High-damage charge attack', 10)],
+  skills: [], // TODO: Load skills from SkillConfig (CSV) at runtime
   equipment: [],
 );

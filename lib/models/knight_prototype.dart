@@ -12,6 +12,6 @@ final knightPrototype = Character(
   stamina: 12,
   exhaust: 100,
   exhaustRecovery: 20,
-  skills: [Skill('Shield Wall', 'Reduces incoming damage', 10)],
+  skills: [], // TODO: Load skills from SkillConfig (CSV) at runtime
   equipment: [],
 );

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import '../models/character.dart';
+import 'skills_csv_loader.dart';
 
 Future<List<Character>> loadCharactersFromCsv(String assetPath) async {
   final csvString = await rootBundle.loadString(assetPath);
@@ -20,6 +21,8 @@ Future<List<Character>> loadCharactersFromCsv(String assetPath) async {
   final exhaustRecoveryNormalIdx = header.indexOf('exhaust_recovery_normal');
   final tapAttackCooldownIdx = header.indexOf('tap_attack_cooldown');
 
+  final skillConfigs = await SkillConfig.loadAll();
+
   return lines.skip(1).map((line) {
     final fields = line.split(',');
     final name = fields[nameIdx];
@@ -27,6 +30,10 @@ Future<List<Character>> loadCharactersFromCsv(String assetPath) async {
       (e) => e.name.toLowerCase() == name.toLowerCase(),
       orElse: () => CharacterClass.knight,
     );
+    final charSkills = skillConfigs
+        .where((s) => s.character.toLowerCase() == name.toLowerCase())
+        .map((s) => Skill.fromConfig(s))
+        .toList();
     return Character(
       name: name,
       charClass: charClass,
@@ -42,6 +49,7 @@ Future<List<Character>> loadCharactersFromCsv(String assetPath) async {
       exhaustRecoverySlow: int.parse(fields[exhaustRecoverySlowIdx]),
       exhaustRecoveryNormal: int.parse(fields[exhaustRecoveryNormalIdx]),
       tapAttackCooldown: double.parse(fields[tapAttackCooldownIdx]),
+      skills: charSkills,
     );
   }).toList();
 }

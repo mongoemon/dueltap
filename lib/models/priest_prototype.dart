@@ -12,6 +12,6 @@ final priestPrototype = Character(
   stamina: 13,
   exhaust: 100,
   exhaustRecovery: 20,
-  skills: [Skill('Divine Heal', 'Heals self or ally', 10)],
+  skills: [], // TODO: Load skills from SkillConfig (CSV) at runtime
   equipment: [],
 );

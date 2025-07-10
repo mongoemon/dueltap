@@ -12,6 +12,6 @@ final ninjaPrototype = Character(
   stamina: 11,
   exhaust: 100,
   exhaustRecovery: 20,
-  skills: [Skill('Shadow Strike', 'Increases critical hit chance', 10)],
+  skills: [], // TODO: Load skills from SkillConfig (CSV) at runtime
   equipment: [],
 );
