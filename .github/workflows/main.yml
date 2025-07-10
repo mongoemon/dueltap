@@ -2,54 +2,114 @@ name: Flutter CI/CD
 
 on:
   push:
-    branches: [main]
     tags:
-      - 'v*.*.*'
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+      - 'v*.*.*' # Trigger on version tags like v1.0.0, v1.0.0-beta
 
 jobs:
-  build:
-    runs-on: macos-latest
+  build_android:
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
-          channel: stable
+          flutter-version: '3.x' # Use a specific Flutter version or 'stable'
 
-      - name: Install dependencies
+      - name: Get Flutter dependencies
         run: flutter pub get
-        working-directory: .
 
-      - name: Run analyzer
-        run: flutter analyze
-        working-directory: .
-
-      - name: Run tests
-        run: flutter test
-        working-directory: .
-
-      - name: Build Android APK (release)
+      - name: Build Android APK
         run: flutter build apk --release
-        working-directory: .
 
-      - name: Build iOS (release, no-codesign)
-        run: flutter build ios --release --no-codesign
-        working-directory: .
-
-      - name: Upload Android APK
+      - name: Upload Android Artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Upload iOS build
+  build_ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x' # Use a specific Flutter version or 'stable'
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Build iOS App
+        run: flutter build ios --release --no-codesign
+
+      - name: Archive iOS App
+        run: |
+          cd build/ios/iphoneos
+          zip -r Runner.app.zip Runner.app
+
+      - name: Upload iOS Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-build
-          path: build/ios/iphoneos/Runner.app
+          name: ios-app
+          path: build/ios/iphoneos/Runner.app.zip
+
+  create_release:
+    runs-on: ubuntu-latest
+    needs: [build_android, build_ios] # Ensure build jobs complete successfully
+
+    steps:
+      - name: Download Android APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: artifacts/android
+
+      - name: Download iOS App artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-app
+          path: artifacts/ios
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |-
+            Automated release build from tag ${{ github.ref }}.
+            
+            **Android APK:**
+            **iOS App (unsigned .app bundle):**
+            
+            *Note: For App Store distribution, a signed IPA is required.*
+          draft: false
+          prerelease: false
+
+      - name: Upload Android APK to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/android/app-release.apk
+          asset_name: app-release.apk
+          asset_content_type: application/vnd.android.package-archive
+
+      - name: Upload iOS App to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/ios/Runner.app.zip
+          asset_name: Runner.app.zip
+          asset_content_type: application/zip
