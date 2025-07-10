@@ -1,0 +1,6 @@
+element,x,y,width,height,animation_type
+logo,0.5,0.18,120,120,fade_in
+story_button,0.5,0.38,220,48,slide_up
+play_button,0.5,0.48,220,48,slide_up
+character_button,0.5,0.58,220,48,slide_up
+local_pvp_button,0.5,0.68,220,48,slide_up 

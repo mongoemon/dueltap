@@ -1,7 +1,7 @@
-name,auto_attack,tap_attack,defense,speed,stamina,strength,hp
-Warrior,11,6,12,3,5,15,100
-Mage,12,7,7,5,4,10,80
-Ninja,7,5,10,6,6,12,90
-Knight,10,5,15,4,3,18,110
-Priest,8,4,10,4,7,8,95
-Dummy,10,3,8,6,8,5,100
+name,auto_attack,tap_attack,defense,speed,stamina,strength,hp,exhaust,exhaust_cost_percent,exhaust_recovery_slow,exhaust_recovery_normal,tap_attack_cooldown
+Warrior,22,14,8,4,7,3,120,140,8,2,25,0.7
+Mage,25,16,5,6,6,4,90,110,10,3,22,0.8
+Ninja,18,12,7,8,8,5,100,120,7,3,28,0.5
+Knight,20,12,12,5,6,4,130,150,7,2,30,0.9
+Priest,15,10,9,5,9,6,105,115,8,3,24,0.8
+Dummy,12,8,6,4,7,4,100,500,8,2,22,0.7

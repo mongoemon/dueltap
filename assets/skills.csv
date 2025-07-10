@@ -1,0 +1,9 @@
+character,skill_name,cooldown,multiplier,effect_type,effect_value,description
+Warrior,Iron Smash,2,2.8,stun,1,High-damage attack with stun
+Warrior,Shield Bash,2,1.5,defense_buff,30,Boosts defense
+Mage,Arcane Burst,3,3.2,aoe,0,Area-effect magic attack
+Mage,Magic Shield,2,1.0,shield,40,Temporary shield
+Ninja,Shadow Strike,2,2.0,speed_buff,20,Fast attack with speed buff
+Knight,Shield Wall,3,1.2,defense_buff,40,Major defense boost
+Priest,Divine Heal,2,1.0,heal,30,Heals self or ally
+Dummy,Taunt,2,1.0,defense_buff,10,Taunt with minor defense 

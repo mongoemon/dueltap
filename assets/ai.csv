@@ -1,0 +1,7 @@
+character,aggression,skill_usage_freq,target_priority,description
+Warrior,8,4,player,Very aggressive, uses skills often
+Mage,6,6,random,Prefers skills, targets random
+Ninja,7,5,player,Fast, uses skills frequently
+Knight,7,3,player,Tanky, moderate skill use
+Priest,5,5,player,Heals and supports
+Dummy,2,1,player,Low aggression, rarely uses skills 

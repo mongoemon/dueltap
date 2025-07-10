@@ -1,6 +1,5 @@
 // Example equipment presets for offline play
 import 'character.dart';
-import 'battle.dart';
 
 final sword = Equipment('Iron Sword', 'weapon', {'attack': 5});
 final shield = Equipment('Wooden Shield', 'armor', {'defense': 3});

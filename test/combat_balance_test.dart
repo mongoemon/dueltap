@@ -1,8 +1,8 @@
 // Unit test for combat balance (tap/charge, skills, stats)
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/models/character.dart';
-import '../lib/models/battle.dart';
-import '../lib/services/battle_service.dart';
+import 'package:dueltap/models/character.dart';
+import 'package:dueltap/models/battle.dart';
+import 'package:dueltap/services/battle_service.dart';
 
 void main() {
   test('Tap and charge attack balance', () {

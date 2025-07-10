@@ -17,7 +17,9 @@ class _LocalPvpSelectScreenState extends State<LocalPvpSelectScreen> {
   @override
   void initState() {
     super.initState();
-    loadCharacterPrototypes().then((chars) => setState(() => _characters = chars));
+    loadCharacterPrototypes().then(
+      (chars) => setState(() => _characters = chars),
+    );
   }
 
   @override
@@ -31,10 +33,16 @@ class _LocalPvpSelectScreenState extends State<LocalPvpSelectScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text('Player 1: Select your character'),
-          _characterPicker(_player1Index, (idx) => setState(() => _player1Index = idx)),
+          _characterPicker(
+            _player1Index,
+            (idx) => setState(() => _player1Index = idx),
+          ),
           const Divider(),
           const Text('Player 2: Select your character'),
-          _characterPicker(_player2Index, (idx) => setState(() => _player2Index = idx)),
+          _characterPicker(
+            _player2Index,
+            (idx) => setState(() => _player2Index = idx),
+          ),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: _player1Index != null && _player2Index != null
@@ -44,6 +52,9 @@ class _LocalPvpSelectScreenState extends State<LocalPvpSelectScreen> {
                         builder: (_) => CombatScreen(
                           player: _characters![_player1Index!],
                           opponent: _characters![_player2Index!],
+                          localPvp:
+                              _characters![_player1Index!] !=
+                              _characters![_player2Index!],
                         ),
                       ),
                     );
@@ -56,7 +67,7 @@ class _LocalPvpSelectScreenState extends State<LocalPvpSelectScreen> {
     );
   }
 
-  Widget _characterPicker(int? selected, void Function(int) onSelect, {int? disabled}) {
+  Widget _characterPicker(int? selected, void Function(int) onSelect) {
     return SizedBox(
       height: 120,
       child: ListView.builder(

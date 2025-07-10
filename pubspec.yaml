@@ -37,6 +37,7 @@ dependencies:
   flame: ^1.30.0
   shared_preferences: ^2.5.3
   audioplayers: ^6.5.0
+  csv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
@@ -92,4 +93,10 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
   assets:
+    - assets/battle.csv
     - assets/characters.csv
+    - assets/skills.csv
+    - assets/status_effects.csv
+    - assets/combo.csv
+    - assets/ai.csv
+    - assets/main_menu_layout.csv

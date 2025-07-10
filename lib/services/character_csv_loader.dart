@@ -14,6 +14,11 @@ Future<List<Character>> loadCharactersFromCsv(String assetPath) async {
   final staIdx = header.indexOf('stamina');
   final strIdx = header.indexOf('strength');
   final hpIdx = header.indexOf('hp');
+  final exhaustIdx = header.indexOf('exhaust');
+  final exhaustCostPercentIdx = header.indexOf('exhaust_cost_percent');
+  final exhaustRecoverySlowIdx = header.indexOf('exhaust_recovery_slow');
+  final exhaustRecoveryNormalIdx = header.indexOf('exhaust_recovery_normal');
+  final tapAttackCooldownIdx = header.indexOf('tap_attack_cooldown');
 
   return lines.skip(1).map((line) {
     final fields = line.split(',');
@@ -32,6 +37,11 @@ Future<List<Character>> loadCharactersFromCsv(String assetPath) async {
       stamina: int.parse(fields[staIdx]),
       strength: int.parse(fields[strIdx]),
       hp: int.parse(fields[hpIdx]),
+      exhaust: int.parse(fields[exhaustIdx]),
+      exhaustCostPercent: int.parse(fields[exhaustCostPercentIdx]),
+      exhaustRecoverySlow: int.parse(fields[exhaustRecoverySlowIdx]),
+      exhaustRecoveryNormal: int.parse(fields[exhaustRecoveryNormalIdx]),
+      tapAttackCooldown: double.parse(fields[tapAttackCooldownIdx]),
     );
   }).toList();
 }

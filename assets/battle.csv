@@ -1,0 +1,28 @@
+parameter,value,description
+auto_attack_min,1,Minimum possible auto-attack damage
+auto_attack_max,999,Maximum possible auto-attack damage
+auto_attack_interval,0.7,Seconds between auto-attack gauge increments
+auto_attack_decay,2,Decay per increment for auto-attack gauge
+auto_attack_gauge_max,100,Value at which auto-attack gauge is full
+heal_amount,18,Default HP restored by heal
+special_attack_multiplier,2.5,Multiplier for special attack damage
+shield_duration,7,Seconds shield lasts
+shield_reduction,0.6,Percent damage reduced by shield
+stamina_gauge_factor,10,Multiplier for stamina to gauge fill
+exhaust_cost_percent,8,Percent of max exhaust gauge depleted per tap attack
+exhaust_recovery_slow,2,Exhaust recovery per tick when below cost
+exhaust_recovery_normal,25,Exhaust recovery per tick when above cost
+max_exhaust_gauge,120,Default max exhaust gauge (overridden by character if set)
+max_gauge,100,Max value for player/opponent gauge
+max_attack_gauge,100,Max value for opponent attack gauge
+max_player_attack_gauge,100,Max value for player attack gauge
+max_shield_gauge,100,Max value for shield gauge
+player_recovery_points,2,Number of times player can heal per battle
+opponent_recovery_points,2,Number of times opponent can heal per battle
+shield_deplete_per_tick,14,Shield gauge depleted per tick
+evade_chance_per_speed,0.025,Evade chance per speed point
+max_evade_chance,0.45,Maximum evade chance (45%)
+crit_chance,0.13,Chance for critical hit (13%)
+crit_multiplier,2.3,Critical hit damage multiplier
+miss_chance,0.04,Chance to miss (4%)
+rng_seed,42,Seed for deterministic RNG (optional) 

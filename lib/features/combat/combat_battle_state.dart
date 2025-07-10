@@ -1,28 +1,35 @@
 import 'dart:math';
 import '../../models/character.dart';
+import '../../services/battle_config_loader.dart';
+import '../../services/status_effects_csv_loader.dart';
 
 class CombatBattleState {
+  final BattleConfig config;
+  final List<StatusEffectConfig> statusEffects;
   int playerHp;
   int opponentHp;
   final Character player;
   final Character opponent;
   int playerGauge = 0;
   int opponentGauge = 0;
-  final int maxGauge = 100;
-  final int healAmount = 15;
-  int playerRecoveryPoints = 2;
-  int opponentRecoveryPoints = 2;
+  int get maxGauge => config.getInt('max_gauge', 100);
+  int get healAmount => config.getInt('heal_amount', 15);
+  int get playerRecoveryPoints => config.getInt('player_recovery_points', 2);
+  int get opponentRecoveryPoints =>
+      config.getInt('opponent_recovery_points', 2);
   int opponentAttackGauge = 0; // 0-100, fills every 3 seconds for auto attack
-  final int maxAttackGauge = 100;
+  int get maxAttackGauge => config.getInt('max_attack_gauge', 100);
 
   // Player shield state
   bool playerShieldActive = false;
   int playerShieldGauge = 0; // 0-100, depletes over 10 seconds
-  final int maxShieldGauge = 100;
+  int get maxShieldGauge => config.getInt('max_shield_gauge', 100);
 
   // Player auto-attack gauge
   int playerAttackGauge = 0; // 0-100, fills based on player speed
-  final int maxPlayerAttackGauge = 100;
+  int get maxPlayerAttackGauge => config.getInt('max_player_attack_gauge', 100);
+  int _playerAutoAttackIncrements =
+      0; // Track how many times gauge has been incremented since last reset
 
   // Buff/debuff system
   int playerSpeedBuff = 0; // +speed
@@ -33,52 +40,76 @@ class CombatBattleState {
   // Exhaust system
   int playerExhaustGauge;
   int opponentExhaustGauge;
-  final int maxExhaustGauge;
+  // Remove: final int maxExhaustGauge;
 
-  final Random _rand = Random();
+  late final Random _rng;
+  int _playerRecoveryPoints;
+  int _opponentRecoveryPoints;
 
-  CombatBattleState({required this.player, required this.opponent})
-    : playerHp = player.hp,
-      opponentHp = opponent.hp,
-      playerExhaustGauge = player.exhaust,
-      opponentExhaustGauge = opponent.exhaust,
-      maxExhaustGauge = player.exhaust;
+  CombatBattleState({
+    required this.player,
+    required this.opponent,
+    required this.config,
+    required this.statusEffects,
+  }) : playerHp = player.hp,
+       opponentHp = opponent.hp,
+       playerExhaustGauge = player.exhaust,
+       opponentExhaustGauge = opponent.exhaust,
+       _playerRecoveryPoints = config.getInt('player_recovery_points', 2),
+       _opponentRecoveryPoints = config.getInt('opponent_recovery_points', 2) {
+    final seed = config.getInt('rng_seed', 42);
+    _rng = Random(seed);
+  }
 
-  int get exhaustCost => (maxExhaustGauge * 0.25).ceil();
+  int get playerExhaustCost =>
+      (player.exhaust * player.exhaustCostPercent / 100).ceil();
+  int get opponentExhaustCost =>
+      (opponent.exhaust * opponent.exhaustCostPercent / 100).ceil();
 
-  bool get isPlayerExhausted => playerExhaustGauge < exhaustCost;
-  bool get isOpponentExhausted => opponentExhaustGauge < exhaustCost;
+  bool get isPlayerExhausted => playerExhaustGauge < playerExhaustCost;
+  bool get isOpponentExhausted => opponentExhaustGauge < opponentExhaustCost;
 
   void depletePlayerExhaust() {
-    playerExhaustGauge -= exhaustCost;
+    playerExhaustGauge -= playerExhaustCost;
     if (playerExhaustGauge < 0) playerExhaustGauge = 0;
   }
 
   void recoverPlayerExhaust() {
-    if (playerExhaustGauge < exhaustCost) {
-      playerExhaustGauge += 1; // Slow recovery until enough for one attack
+    if (playerExhaustGauge < playerExhaustCost) {
+      playerExhaustGauge += player.exhaustRecoverySlow;
     } else {
-      playerExhaustGauge += player.exhaustRecovery;
+      playerExhaustGauge += player.exhaustRecoveryNormal;
     }
-    if (playerExhaustGauge > maxExhaustGauge) playerExhaustGauge = maxExhaustGauge;
+    if (playerExhaustGauge > player.exhaust)
+      playerExhaustGauge = player.exhaust;
   }
 
   void depleteOpponentExhaust() {
-    opponentExhaustGauge -= exhaustCost;
+    opponentExhaustGauge -= opponentExhaustCost;
     if (opponentExhaustGauge < 0) opponentExhaustGauge = 0;
   }
 
   void recoverOpponentExhaust() {
-    if (opponentExhaustGauge < exhaustCost) {
-      opponentExhaustGauge += 1;
+    if (opponentExhaustGauge < opponentExhaustCost) {
+      opponentExhaustGauge += opponent.exhaustRecoverySlow;
     } else {
-      opponentExhaustGauge += opponent.exhaustRecovery;
+      opponentExhaustGauge += opponent.exhaustRecoveryNormal;
     }
-    if (opponentExhaustGauge > maxExhaustGauge) opponentExhaustGauge = maxExhaustGauge;
+    if (opponentExhaustGauge > opponent.exhaust)
+      opponentExhaustGauge = opponent.exhaust;
   }
 
+  double get critChance => config.getDouble('crit_chance', 0.1);
+  double get critMultiplier => config.getDouble('crit_multiplier', 2.0);
+  double get missChance => config.getDouble('miss_chance', 0.05);
+
+  bool _isCrit() => _rng.nextDouble() < critChance;
+  bool _isMiss() => _rng.nextDouble() < missChance;
+
   void attackOpponent() {
+    if (_isMiss()) return; // Missed attack
     int dmg = player.tapAttack;
+    if (_isCrit()) dmg = (dmg * critMultiplier).round();
     // Reduce by opponent's strength percent
     dmg = (dmg * (1 - opponent.strength / 100)).round();
     opponentHp -= dmg;
@@ -90,7 +121,9 @@ class CombatBattleState {
   }
 
   void playerAutoAttack() {
+    if (_isMiss()) return;
     int dmg = player.autoAttack;
+    if (_isCrit()) dmg = (dmg * critMultiplier).round();
     dmg = (dmg * (1 - opponent.strength / 100)).round();
     opponentHp -= dmg;
     if (opponentHp < 0) opponentHp = 0;
@@ -101,7 +134,9 @@ class CombatBattleState {
   }
 
   void attackPlayer() {
+    if (_isMiss()) return;
     int dmg = opponent.tapAttack;
+    if (_isCrit()) dmg = (dmg * critMultiplier).round();
     if (playerShieldActive) {
       dmg = (dmg * 0.5).round();
     }
@@ -116,7 +151,9 @@ class CombatBattleState {
   }
 
   void opponentAutoAttack() {
+    if (_isMiss()) return;
     int dmg = opponent.autoAttack;
+    if (_isCrit()) dmg = (dmg * critMultiplier).round();
     if (playerShieldActive) {
       dmg = (dmg * 0.5).round();
     }
@@ -130,18 +167,18 @@ class CombatBattleState {
   }
 
   void healPlayer() {
-    if (playerRecoveryPoints > 0 && playerHp < 100) {
+    if (_playerRecoveryPoints > 0 && playerHp < 100) {
       playerHp += healAmount;
       if (playerHp > 100) playerHp = 100;
-      playerRecoveryPoints--;
+      _playerRecoveryPoints--;
     }
   }
 
   void healOpponent() {
-    if (opponentRecoveryPoints > 0 && opponentHp < 100) {
+    if (_opponentRecoveryPoints > 0 && opponentHp < 100) {
       opponentHp += healAmount;
       if (opponentHp > 100) opponentHp = 100;
-      opponentRecoveryPoints--;
+      _opponentRecoveryPoints--;
     }
   }
 
@@ -161,10 +198,16 @@ class CombatBattleState {
 
   // Call this every second to increment the player's attack gauge
   bool incrementPlayerAttackGauge() {
-    // Fill rate = stamina * 7 (higher stamina = faster auto-attack)
-    playerAttackGauge += (player.stamina * 7).clamp(1, 100);
+    // Fill rate decays: each increment is slower than the last
+    // Example: base = stamina * 7, decay = 1 per increment
+    int base = (player.stamina * 7).clamp(1, 100);
+    int decay = _playerAutoAttackIncrements;
+    int increment = (base - decay).clamp(1, 100);
+    playerAttackGauge += increment;
+    _playerAutoAttackIncrements++;
     if (playerAttackGauge >= maxPlayerAttackGauge) {
       playerAttackGauge = 0;
+      _playerAutoAttackIncrements = 0;
       return true; // Ready to auto-attack
     }
     return false;
@@ -189,7 +232,10 @@ class CombatBattleState {
 
   void depletePlayerShieldGauge() {
     if (playerShieldActive) {
-      playerShieldGauge -= 10; // 10 seconds to deplete (100/10)
+      playerShieldGauge -= config.getInt(
+        'shield_deplete_per_tick',
+        10,
+      ); // 10 seconds to deplete (100/10)
       if (playerShieldGauge <= 0) {
         playerShieldGauge = 0;
         playerShieldActive = false;
@@ -208,22 +254,45 @@ class CombatBattleState {
     }
   }
 
-  void applySpeedBuff(int amount, int frames) {
-    playerSpeedBuff = amount;
-    playerSpeedBuffFrames = frames;
+  void applySpeedBuff() {
+    final effect = statusEffects.firstWhere(
+      (e) => e.effectName == 'speed_buff',
+      orElse: () => StatusEffectConfig(
+        effectName: 'speed_buff',
+        duration: 2,
+        strength: 10,
+        stackable: false,
+        description: 'Default speed buff',
+      ),
+    );
+    playerSpeedBuff = effect.strength.toInt();
+    playerSpeedBuffFrames = effect.duration;
   }
 
-  void applyDamageReductionBuff(double percent, int frames) {
-    playerDamageReductionBuff = percent;
-    playerDamageReductionBuffFrames = frames;
+  void applyDamageReductionBuff() {
+    final effect = statusEffects.firstWhere(
+      (e) => e.effectName == 'defense_buff',
+      orElse: () => StatusEffectConfig(
+        effectName: 'defense_buff',
+        duration: 2,
+        strength: 0.2,
+        stackable: false,
+        description: 'Default defense buff',
+      ),
+    );
+    playerDamageReductionBuff = effect.strength;
+    playerDamageReductionBuffFrames = effect.duration;
   }
 
   int get effectivePlayerSpeed => player.speed + playerSpeedBuff;
 
+  double get evadeChancePerSpeed =>
+      config.getDouble('evade_chance_per_speed', 0.02);
+  double get maxEvadeChance => config.getDouble('max_evade_chance', 0.5);
   bool tryEvade(int speed) {
     // Example: 2% evade chance per speed point, max 50%
-    double evadeChance = (speed * 0.02).clamp(0, 0.5);
-    return _rand.nextDouble() < evadeChance;
+    double evadeChance = (speed * evadeChancePerSpeed).clamp(0, maxEvadeChance);
+    return _rng.nextDouble() < evadeChance;
   }
 
   // Returns true if hit, false if evaded
@@ -290,4 +359,7 @@ class CombatBattleState {
     if (playerGauge > maxGauge) playerGauge = maxGauge;
     return true;
   }
+
+  int get opponentShieldGauge =>
+      0; // TODO: Implement opponent shield logic if needed
 }

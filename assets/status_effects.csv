@@ -1,0 +1,6 @@
+effect_name,duration,strength,stackable,description
+stun,1,0,false,Target cannot act for 1 turn
+shield,2,40,false,Absorbs 40 damage for 2 turns
+defense_buff,2,30,true,Increase defense by 30% for 2 turns
+speed_buff,2,20,true,Increase speed by 20% for 2 turns
+heal,1,30,false,Restore 30 HP instantly 

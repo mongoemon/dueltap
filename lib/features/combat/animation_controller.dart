@@ -1,5 +1,4 @@
 // AnimationController for tap/charge/skill animations (placeholder)
-import 'package:flame/components.dart';
 
 class CombatAnimationController {
   void playTapAttack() {

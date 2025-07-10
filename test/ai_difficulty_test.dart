@@ -1,7 +1,7 @@
 // Unit test for AI difficulty scaling in PvE mode
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/models/character.dart';
-import '../lib/models/battle.dart';
+import 'package:dueltap/models/character.dart';
+import 'package:dueltap/models/battle.dart';
 
 void main() {
   test('AI opponent stats scale with player level', () {

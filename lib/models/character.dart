@@ -14,6 +14,10 @@ class Character {
   int hp;
   int exhaust;
   int exhaustRecovery;
+  int exhaustCostPercent;
+  int exhaustRecoverySlow;
+  int exhaustRecoveryNormal;
+  double tapAttackCooldown;
   List<Skill> skills;
   List<Equipment> equipment;
 
@@ -32,6 +36,10 @@ class Character {
     this.hp = 100,
     this.exhaust = 100,
     this.exhaustRecovery = 20,
+    this.exhaustCostPercent = 5,
+    this.exhaustRecoverySlow = 1,
+    this.exhaustRecoveryNormal = 20,
+    this.tapAttackCooldown = 0.7,
     this.skills = const [],
     this.equipment = const [],
   });

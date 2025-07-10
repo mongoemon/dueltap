@@ -1,0 +1,14 @@
+element,x,y,width,height,notes
+player_avatar,0.1,0.2,0.2,0.2,Fraction of screen (0-1)
+opponent_avatar,0.7,0.2,0.2,0.2,Fraction of screen (0-1)
+player_stats,0.1,0.42,0.2,0.1,Fraction of screen (0-1)
+opponent_stats,0.7,0.42,0.2,0.1,Fraction of screen (0-1)
+player_buttons,0.1,0.55,0.2,0.2,Fraction of screen (0-1)
+opponent_buttons,0.7,0.55,0.2,0.2,Fraction of screen (0-1)
+player_gauge,0.1,0.78,0.2,0.05,Fraction of screen (0-1)
+opponent_gauge,0.7,0.78,0.2,0.05,Fraction of screen (0-1)
+center_arena,0.3,0.2,0.4,0.6,For effects, etc. 
+player_damage_number,,-0.05,,,Fraction of screen height for red number above player
+player_heal_number,,-0.30,,,Fraction of screen height for blue number above player
+opponent_damage_number,,-0.05,,,Fraction of screen height for red number above opponent
+opponent_heal_number,,-0.30,,,Fraction of screen height for blue number above opponent 

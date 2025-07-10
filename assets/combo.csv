@@ -1,0 +1,3 @@
+combo_name,threshold,multiplier,bonus_type,bonus_value,description
+basic_combo,2,1.7,extra_damage,15,Deal 15 extra damage after 2 consecutive hits
+charge_attack,3,2.5,stun,1,Stun after 3 charge attacks 
